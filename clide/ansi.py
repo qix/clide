@@ -1,6 +1,8 @@
 # clide:
 #   source: https://raw.githubusercontent.com/qix/clide/master/clide/ansi.py
-#
+#   version: 0.9.0
+# License under the MIT License.
+# See https://github.com/qix/clide/blob/master/LICENSE for details
 
 from functools import partial
 from typing import List
@@ -14,12 +16,15 @@ code_magenta = 5
 code_cyan = 6
 code_white = 7
 
+
 def ansi_sgr(sequence: List[int]):
-    'Select Graphic Rendition'
-    return "\033[%sm" % ';'.join(map(str, sequence))
+    "Select Graphic Rendition"
+    return "\033[%sm" % ";".join(map(str, sequence))
+
 
 def colored(
-    text, *,
+    text,
+    *,
     foreground=None,
     background=None,
     bold=False,
@@ -52,7 +57,8 @@ def colored(
         sequence.append(30 + foreground + (60 if bright else 0))
     if background is not None:
         sequence.append(40 + background + (60 if bright_background else 0))
-    return ansi_sgr(sequence)  + text + ansi_sgr([0])
+    return ansi_sgr(sequence) + text + ansi_sgr([0])
+
 
 black = partial(colored, foreground=code_black)
 red = partial(colored, foreground=code_red)
