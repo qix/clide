@@ -8,10 +8,10 @@ import shutil
 import subprocess
 import sys
 import urllib.request
-from contextlib import contextmanager
-from tempfile import NamedTemporaryFile
 from typing import Dict, Iterator
 from pathlib import Path
+
+from .atomic_write import atomic_write_context
 
 RE_PREFIX = re.compile(r"^\s*")
 RE_SETTING = re.compile(r"^([a-z]+): ([^ ]+)$")
@@ -74,31 +74,13 @@ def read_clide_configuration(path: Path):
                 return _decode_config(lines, "#  ")
 
 
-@contextmanager
-def atomic_write_context(path: Path, mode: str = "w+b"):
-    with NamedTemporaryFile(
-        mode=mode, prefix=f"{path.name}.tmp.", dir=path.parent, delete=False
-    ) as f:
-        try:
-            yield f
-            f.flush()
-            os.fsync(f.fileno())
-            os.rename(f.name, path)
-        finally:
-            # Make sure we removed the file if something went wrong
-            try:
-                os.unlink(f.name)
-            except FileNotFoundError:
-                pass
-
-
 def fetch_latest(path: Path, config: Dict[str, str]):
     with urllib.request.urlopen(config["source"]) as response:
         with atomic_write_context(path, "w+b") as f:
             shutil.copyfileobj(response, f)
 
 
-def main():
+def update():
     # In future we may want to support more version control systems
     if not shutil.which("git"):
         abort("`clide update` requires a git client")
@@ -116,4 +98,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    update()
