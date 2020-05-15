@@ -12,7 +12,7 @@ from typing import Optional, Union
 
 
 @contextmanager
-def atomic_write_context(path: Path, mode: str = "w+b", *, chmod: Optional[int]):
+def atomic_write_context(path: Path, mode: str = "w+b", *, chmod: Optional[int] = None):
     path = Path(path)
     with NamedTemporaryFile(
         mode=mode, prefix=f"{path.name}.tmp.", dir=path.parent, delete=False
@@ -21,7 +21,7 @@ def atomic_write_context(path: Path, mode: str = "w+b", *, chmod: Optional[int])
             yield f
             f.flush()
             os.fsync(f.fileno())
-            if chmod:
+            if chmod is not None:
                 os.chmod(f.fileno(), chmod)
             os.rename(f.name, path)
         finally:

@@ -9,6 +9,7 @@ import sys
 from typing import List
 
 default_sentinel = object()
+escape = "\033["
 
 code_black = 0
 code_red = 1
@@ -22,7 +23,7 @@ code_white = 7
 
 def ansi_sgr(sequence: List[int]):
     "Select Graphic Rendition"
-    return "\033[%sm" % ";".join(map(str, sequence))
+    return escape + "%sm" % ";".join(map(str, sequence))
 
 
 reset = ansi_sgr([0])
@@ -74,6 +75,10 @@ def build_color(c):
     return fn
 
 
+def build_char(c):
+    return escape + c
+
+
 black = build_color(code_black)
 red = build_color(code_red)
 green = build_color(code_green)
@@ -82,6 +87,24 @@ blue = build_color(code_blue)
 magenta = build_color(code_magenta)
 cyan = build_color(code_cyan)
 white = build_color(code_white)
+
+# See http://ascii-table.com/ansi-escape-sequences.php
+cursor_back = build_char("D")
+cursor_down = build_char("B")
+cursor_erase_line = build_char("K")
+cursor_erase = build_char("J")
+cursor_forward = build_char("C")
+cursor_next_line = build_char("E")
+cursor_prev_line = build_char("F")
+cursor_save = build_char("s")
+cursor_scroll_down = build_char("T")
+cursor_scroll_up = build_char("S")
+cursor_restore = build_char("u")
+cursor_up = build_char("A")
+
+
+def cursor_goto(line: int, column: int):
+    return f"{escape}{line};{column}H"
 
 
 def ansi_message(color_escape, code, message):
