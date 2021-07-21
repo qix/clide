@@ -63,7 +63,10 @@ def color(
 
 def build_color(c):
     def fn(
-        text=None, *, ansi=True, **kv,
+        text=None,
+        *,
+        ansi=True,
+        **kv,
     ):
         if text is None:
             return color(foreground=c, **kv)
@@ -120,6 +123,7 @@ def ansi_message(color_escape, code, message):
         + message,
         file=sys.stderr,
     )
+    sys.stderr.flush()
 
 
 def info(message: str):
